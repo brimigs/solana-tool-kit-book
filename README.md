@@ -1,5 +1,5 @@
 ---
-# metadata up here
+# The Solana Toolkit
 ---
 
 The Solana Toolkit consists of all open sourced tools for smart contract development on the Solana Blockchain.
@@ -28,17 +28,18 @@ This section will cover all the toolkit basics to help you get started.
 
 ### Keypair generation
 
-For a fresh installation of the [Solana CLI](https://docs.anza.xyz/cli/), you're required to generate a new keypair. 
+For a fresh installation of the [Solana CLI](https://docs.anza.xyz/cli/), you're required to generate a new keypair.
 
 ```shell
 solana-keygen new
 ```
 
 The above command will both:
+
 - print the pubkey generated
 - store the your new keypair at the Solana CLI's default path (`~/.config/solana/id.json`) unless you already have a keypair saved there
- 
-Check the pubkey of your machine's newly generated keypair: 
+
+Check the pubkey of your machine's newly generated keypair:
 
 ```shell
 solana address
@@ -76,11 +77,10 @@ solana logs
 
 For a more information, read this [Solana Test Validator Guide](https://solana.com/developers/guides/getstarted/solana-test-validator).
 
-## Projects
-
-### Creating a New Project
+## Creating a New Project
 
 To start a new project with the Solana toolkit, pick which scaffold you want to use. There are scaffolds for:
+
 - [Anchor framework workspaces](#anchor-smart-contract-scaffold)
 - [general scaffolds using `create-solana-program`](#general-smart-contract-scaffold)
 - [web app workspaces](#web-app-scaffold)
@@ -104,8 +104,6 @@ This initializes a simplistic workspace set up for Anchor smart contract develop
 
 The Anchor framework abstracts away many complexities enabling fast program development.
 
-For more information on the Anchor framework, check out the [Anchor book](https://www.anchor-lang.com/).
-
 To test out this project before making any modifications, just build and test:
 
 ```shell
@@ -116,27 +114,91 @@ anchor build
 anchor test
 ```
 
-### General Smart Contract Scaffold
+To start writing your own anchor smart contract, navigate to `programs/src/lib.rs`.
+
+For more complex programs, using a more structured project template would be best practice. This can be generated with:
 
 ```shell
-npx create-solana-program
+anchor init --template multiple
 ```
 
-This initializes a more complex workspace with everything you need for general Solana smart contract development.
+which creates the following layout inside of `programs/src`:
 
-This command gives you the option to choose between Shank and Anchor for the program framework:
+```shell
+├── constants.rs
+├── error.rs
+├── instructions
+│   ├── initialize.rs
+│   └── mod.rs
+├── lib.rs
+└── state
+    └── mod.rs
+```
 
-- **Shank** creates a vanilla Solana smart contract with Shank macros to generate IDLs. For more information on Shank, check out its [README](https://github.com/metaplex-foundation/shank).
+For more information on the Anchor framework, check out the [Anchor book](https://www.anchor-lang.com/).
 
-- **Anchor** creates a smart contract using the Anchor framework, which abstracts away many complexities enabling fast program development. For more information on the Anchor framework, check out the [Anchor book](https://www.anchor-lang.com/).
+### General Smart Contract Scaffold - Create Solana Program
 
-This command also gives the option to choose between a JavaScript client, a Rust Client, or both.
+```shell
+pnpm create solana-program
+```
+
+This initializes a more complex workspace with everything you need for general Solana smart contract development. This Scaffold allows you to write either native rust smart contracts or anchor smart contracts.
+
+After running this command, you'll have the option to choose between Shank and Anchor for the program framework:
+
+- **Shank** creates a vanilla Solana smart contract with Shank macros to generate IDLs. For more information on Shank, read the [README](https://github.com/metaplex-foundation/shank).
+
+- **Anchor** creates a smart contract using the Anchor framework, which abstracts away many complexities enabling fast program development. For more information on the Anchor framework, read the [Anchor book](https://www.anchor-lang.com/).
+
+Next, you'll have the option to choose between a JavaScript client, a Rust Client, or both.
 
 - **JavaScript Client** creates a typescript library compatible with [web3.js](https://solana-labs.github.io/solana-web3.js/).
 
 - **Rust Client** creates a rust crate allowing consumers to interact with the smart contract.
 
 For further workspace customization and additional information, check out the `create-solana-program` [README](https://github.com/solana-program/create-solana-program/tree/main).
+
+After answering the above questions, the workspace will be generated. To get started, build your program and clients by running:
+
+```shell
+cd <my-program-name>
+pnpm install
+pnpm generate
+```
+
+#### Native Rust Smart Contract Development with Create Solana Program
+
+To use `create-solana-program` for native rust development, make sure you chose Shank when asked which program framework to use. This will create a basic counter program with the following project structure for your program:
+
+```shell
+├── program.rs
+│   ├── src.rs
+│   │   ├── assertions.rs
+│   │   ├──entrypoint.rs
+│   │   ├──error.rs
+│   │   ├──instruction.rs
+│   │   ├──lib.rs
+│   │   ├──processor.rs
+│   │   ├──state.rs
+│   │   ├──utils.rs
+│   ├── Cargo.toml
+│   ├── keypair.json
+│   ├── README.md
+```
+
+#### Anchor Smart Contract Development with Create Solana Program
+
+To use `create-solana-program` for native rust development, make sure you chose Anchor when asked which program framework to use. This will create a basic counter program with the following project structure for your program:
+
+```shell
+├── program.rs
+│   ├── src.rs
+│   │   ├── lib.rs
+│   ├── Cargo.toml
+│   ├── keypair.json
+│   ├── README.md
+```
 
 ### Web App Scaffold
 
@@ -204,7 +266,7 @@ To use this template, you will also need to set up the following:
 
 For additional information on Solana Mobile Development: https://docs.solanamobile.com/getting-started/intro
 
-## Smart Contract Layout
+## Smart Contract File Structure Best Practices
 
 Typically Solana smart contract (aka [programs](/docs/core/programs.md)) workspaces will be have the following file structure:
 
@@ -248,29 +310,57 @@ As the smart contract gets more cumbersome, you'll typically want to separate th
         ├── mod.rs
 ```
 
+For native rust smart contract development, you need to explicitly write out the entrypoint and processor for the program, so you'll need a few more files:
+
+```shell
+├── program.rs
+│   ├── src.rs
+│   │   ├──assertions.rs
+│   │   ├──entrypoint.rs
+│   │   ├──error.rs
+│   │   ├──instruction.rs
+│   │   ├──lib.rs
+│   │   ├──processor.rs
+│   │   ├──state.rs
+│   │   ├──utils.rs
+│   ├── Cargo.toml
+│   ├── keypair.json
+│   ├── README.md
+```
+
 ## Working on an Existing Project
 
-The Solana toolkit makes developing with existing projects have no overhead.
+If you have an existing anchor program and want to use the [create solana program tool](#general-smart-contract-scaffold), you can easily replace the generated program with your existing one:
 
-```shell
-npm install
+1. Ensure the installed Solana and Anchor versions are the same as the ones your existing program requires.
+
+2. Scaffold a new Solana program using Anchor. `pnpm create solana-program --anchor`.
+
+3. Replace the `program` folder with your existing program directory (not the workspace directory). If you have more than one program, add more folders to the root directory and update the `members` attribute of the top-level `Cargo.toml` accordingly.
+
+4. Ensure your program’s `Cargo.toml` contains the following metadata:
+
+```
+[package.metadata.solana]
+program-id = "YOUR_PROGRAM_ADDRESS"
+program-dependencies = []
 ```
 
-```shell
-npx solana build
+5. Build your program and clients.
+
+```
+pnpm install
+pnpm programs:build
+pnpm generate
 ```
 
-```shell
-npx solana test
-```
+6. If you have a generated Rust client, update the `clients/rust/src/lib.rs` file so the `ID` alias points to the correct generated constant.
 
-```shell
-npx solana deploy
-```
-
-## Verifiable Programs
+7. If you have any generated clients, update the scaffolded tests so they work with your existing program.
 
 ## Dependencies??
+
+/// FIXME: Can we do anything similar to: https://book.getfoundry.sh/projects/dependencies ??
 
 ## Solana Test Suite Overview
 
@@ -386,30 +476,90 @@ View the source code [here](https://github.com/LimeChain/zest?tab=readme-ov-file
 
 ### JavaScript Testing Framework
 
+```shell
+npm  install solana-bankrun
+```
+
+[Bankrun](https://github.com/kevinheavey/solana-bankrun) is a fast and lightweight framework for testing solana programs in NodeJS.
+
+It uses [solana-program-test](https://crates.io/crates/solana-program-test) under the hood and allows you to do things that are not possible with `solana-test-validator`, such as jumping back and forth in time or dynamically setting account data.
+
+Bankrun works by spinning up a lightweight `BanksServer` that's like an RPC node but much faster, and creating a `BanksClient` to talk to the server. This runs the Solana [Banks](https://github.com/solana-labs/solana/blob/master/runtime/src/bank.rs).
+
+Here is a minimal example of this framework:
+
+```javascript
+import { start } from "solana-bankrun";
+import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
+
+test("one transfer", async () => {
+  const context = await start([], []);
+  const client = context.banksClient;
+  const payer = context.payer;
+  const receiver = PublicKey.unique();
+  const blockhash = context.lastBlockhash;
+  const transferLamports = 1_000_000n;
+  const ixs = [
+    SystemProgram.transfer({
+      fromPubkey: payer.publicKey,
+      toPubkey: receiver,
+      lamports: transferLamports,
+    }),
+  ];
+  const tx = new Transaction();
+  tx.recentBlockhash = blockhash;
+  tx.add(...ixs);
+  tx.sign(payer);
+  await client.processTransaction(tx);
+  const balanceAfter = await client.getBalance(receiver);
+  expect(balanceAfter).toEqual(transferLamports);
+});
+```
+
+For more complex examples, please refer to the [Solana Developers Bootcamp](https://github.com/solana-developers/developer-bootcamp-2024/tree/main/project-2-voting/anchor/tests)
+
 ### Rust Testing Library
+
+```shell
+cargo add --dev litesvm
+```
+
+[LiteSVM](https://github.com/LiteSVM/litesvm) is a fast and lightweight library for testing Solana programs. It works by creating an in-process Solana VM optimized for program developers. This makes it much faster to run and compile than alternatives like solana-program-test and solana-test-validator. In a further break from tradition, it has an ergonomic API with sane defaults and extensive configurability for those who want it.
+
+Here is a minimal example:
+
+```rust
+use litesvm::LiteSVM;
+use solana_program::{message::Message, pubkey::Pubkey, system_instruction::transfer};
+use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
+
+let from_keypair = Keypair::new();
+let from = from_keypair.pubkey();
+let to = Pubkey::new_unique();
+
+let mut svm = LiteSVM::new();
+svm.airdrop(&from, 10_000).unwrap();
+
+let instruction = transfer(&from, &to, 64);
+let tx = Transaction::new(
+    &[&from_keypair],
+    Message::new(&[instruction], Some(&from)),
+    svm.latest_blockhash(),
+);
+let tx_res = svm.send_transaction(tx).unwrap();
+
+let from_account = svm.get_account(&from);
+let to_account = svm.get_account(&to);
+assert_eq!(from_account.unwrap().lamports, 4936);
+assert_eq!(to_account.unwrap().lamports, 64);
+
+```
 
 ### Security Vulnerability Scanner
 
-## Solana Cheat Codes
+[Radar](https://github.com/Auditware/radar?tab=readme-ov-file) is static analysis tool for anchor rust programs. It allows you to write, share, and utilize templates to identify security issues in rust-based smart contracts using a powerful python based rule engine that enables automating detection of vulnerable code patterns through logical expressions.
 
-Most of the time, simply testing your smart contract's outputs isn’t enough. To manipulate the state of the blockchain, as well as test for specific reverts and events, you can use the
-
-```Rust
-// Example Rust function to adjust account balances in a test environment
-use solana_program::account_info::{AccountInfo};
-use solana_program::program_error::ProgramError;
-use std::{str::FromStr};
-
-fn adjust_account_balance(account: &AccountInfo, amount: u64) -> Result<(), ProgramError> {
-    let mut data = account.try_borrow_mut_data()?;
-    let mut balance = u64::from_le_bytes(data.clone()[0..8].try_into().unwrap());
-    balance += amount;
-    data[0..8].copy_from_slice(&balance.to_le_bytes());
-    Ok(())
-}
-
-// This function would be part of a larger testing utility library that could be invoked during tests
-```
+[Xray](https://github.com/sec3-product/x-ray) is an open-source, cross-platform command-line interface (CLI) tool designed for static analysis of Solana programs and smart contracts written in Rust.
 
 ## Running a local network
 
@@ -458,8 +608,7 @@ This command initializes a new ledger and starts the validator.
 
 ### Interacting with a Running Test Validator
 
-Once you have the `solana-test-validator` up and running, you can interact with it using various Solana CLI commands. These commands let you deploy programs, manage accounts, send transactions, and much more. Here's a detailed guide on the key commands you will use.
-
+Once you have the `solana-test-validator` up and running, you can interact with it using various Solana CLI commands. These commands let you deploy programs, manage accounts, send transactions, and much more. Below is a detailed guide on the key commands you will use.
 
 Check your current CLI configuration to see which network you are selected too:
 
@@ -714,28 +863,8 @@ solana-install init <VERSION>
 
 Make sure to reset your Solana test validator's ledger after changing versions to ensure it runs a valid ledger without corruption.
 
-## Solana.toml file configs
-
 ## Compute and Fees Section
 
-you dont need to track gas but you can optimize compute.
+In Solana program development, you don't need to track gas but it is best practice to optimize for compute. For more information on how to optimize compute, read the this [guide](https://solana.com/developers/guides/advanced/how-to-request-optimal-compute).
 
-// link to jonas's compute docs -> advanced section
-
-Solana CLI Commands #
-To view all CLI commands and see other ways to interact with the test validator:
-
-solana --help
-
-This command list all flags, options, and subcommands available.
-
-Example Use Case #
-Create a USDC Token Account on your localnet
-
-Clone the USDC mint address to your local validator
-solana-test-validator --clone EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v --url mainnet-beta --reset
-
-Create a token account
-spl-token create-account EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v --url localhost
-
-// FIXME: Add in how to connect to test validator from the front end
+To understand more about fees on Solana, read this [document](https://solana.com/developers/guides/advanced/how-to-request-optimal-compute).
